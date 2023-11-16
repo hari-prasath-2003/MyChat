@@ -1,0 +1,21 @@
+it's a chat app with these feature
+
+features (MVP)
+    1.login #done
+    2.signup #done
+    3.create account every time they enter they will get same socket id #done
+    4.discover user (find other and chat with them ones they start chat they will appear in contact) #done
+        4.1 after discover now the user need to chat with other user
+        4.2 once they chat remove them from recomendation and put them to recomendation
+        4.3 after this i need to save the chat in db so when they open the same account they can view the chat
+    5.user can have recent it is like chat history so user can easily chat with the again
+
+
+additional features
+    1.typing indication
+    2.multimedia sharing
+    3.view other profile (modal simply name and profile photo) 
+
+#Time limit max 15 days 
+
+5 days over
