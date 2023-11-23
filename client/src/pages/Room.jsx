@@ -1,4 +1,4 @@
-import { Paper } from "@mantine/core";
+import { Button, Paper } from "@mantine/core";
 
 import chatStore from "../app/chatStore";
 
@@ -6,13 +6,14 @@ import { useApiGet } from "../hooks/useApiGet.js";
 
 import { useEffect, useRef } from "react";
 
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 import ChatWindow from "../component/Room/ChatWindow";
 import ChatBox from "../component/Room/ChatBox";
 import socket from "../services/socket";
 import userStore from "../app/userStore";
 import Header from "../component/Room/Header.jsx";
+import Chat from "../services/chat/index.js";
 
 const Room = () => {
   const userId = userStore((state) => state.userId);
@@ -21,6 +22,8 @@ const Room = () => {
   const setCurrentMessage = chatStore((state) => state.setCurrentMessage);
   const updateCurrentMessage = chatStore((state) => state.updateCurrentMessage);
 
+  const navigate = useNavigate();
+
   const {
     data: previousChatMsg,
     error,
@@ -28,8 +31,6 @@ const Room = () => {
   } = useApiGet(
     "http://localhost:3000/chat?user1=" + userId + "&user2=" + currentReciver.id
   );
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (!previousChatMsg) return;
@@ -40,13 +41,12 @@ const Room = () => {
   useEffect(() => {
     function handleMsgReceived(msg) {
       const senderId = msg.senderId;
+
       if (senderId !== currentReciver.id) return;
 
       const message = msg.message;
-      const timeStamp = msg.timeStamp;
-      updateCurrentMessage({ senderId, message, timeStamp });
+      updateCurrentMessage({ senderId, message });
     }
-
     socket.on("msg-received", handleMsgReceived);
     return () => {
       socket.off("msg-received", handleMsgReceived);
@@ -69,12 +69,16 @@ const Room = () => {
   return (
     <Paper h={"calc(100vh - 92px)"} pos={"relative"}>
       <Header
-        id={currentReciver.id}
+        currentReciverId={currentReciver.id}
         name={currentReciver.name}
         profile={currentReciver.profile}
       />
       <ChatWindow currentMessage={currentMessage} />
-      <ChatBox handleSendMsg={handleSendMsg} />
+      <ChatBox
+        handleSendMsg={handleSendMsg}
+        receiverId={currentReciver.id}
+        userId={userId}
+      />
     </Paper>
   );
 };

@@ -7,7 +7,7 @@ export default async function getUserInfo(userId) {
       name: 1,
       profile: 1,
       id: 1,
-      _id: -1,
+      _id: 0,
     }
   );
   return userInfo;

@@ -1,5 +1,8 @@
 import { AppShell } from "@mantine/core";
 import "@mantine/core/styles.css";
+
+import socket from "./services/socket";
+
 import { useDisclosure } from "@mantine/hooks";
 import TopNav from "./Layout/mainLayout/TopNav";
 import SideNav from "./Layout/mainLayout/SideNav";
@@ -7,12 +10,24 @@ import Main from "./Layout/mainLayout/Main";
 
 import { useEffect } from "react";
 import ProtectedRoute from "./ProtectedRoute";
-import socket from "./services/socket";
+import { useNavigate } from "react-router-dom";
 
 export default function App() {
   const [opened, { toggle }] = useDisclosure();
+  const navigate = useNavigate();
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    async function handleIncommingCall(senderId) {
+      navigate("/video-call", {
+        state: {
+          role: "callee",
+          receiverId: senderId,
+        },
+      });
+    }
+    socket.on("incomming-call", handleIncommingCall);
+    return () => socket.off("incomming-call", handleIncommingCall);
+  }, []);
 
   return (
     <ProtectedRoute>

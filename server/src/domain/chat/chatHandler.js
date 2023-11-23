@@ -1,8 +1,8 @@
+import getUserInfo from "../../utils/getUserInfo.js";
 import Chat from "./model/chat.js";
 import Conversation from "./model/conversation.js";
 
 export async function handleSendMsg(io, payload) {
-  console.table(payload);
   const senderId = payload.senderId;
   const receiverId = payload.receiverId;
   const message = payload.message;
@@ -23,4 +23,10 @@ export async function handleSendMsg(io, payload) {
   await newChat.save();
 
   io.to(receiverId).emit("msg-received", { senderId, message });
+  const senderInfo = await getUserInfo(senderId);
+  io.to(receiverId).emit("incomming-message", { sender: senderInfo, message });
+}
+
+export function handleUserTyping(io, payload) {
+  io.to(payload.receiverId).emit("user-typing", { senderId: payload.senderId });
 }

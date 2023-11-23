@@ -14,7 +14,6 @@ export async function recentChatHandler(req, res) {
       userContact.map(async ({ users, conversationId }) => {
         const otherUserId = users.find((user) => user !== userId);
         const userInfo = await getUserInfo(otherUserId);
-        console.log({ otherUserId, userInfo });
         const lastMessage = await Chat.findOne(
           {
             conversationId: conversationId,

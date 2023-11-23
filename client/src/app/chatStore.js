@@ -4,10 +4,11 @@ const chatStore = create((set) => ({
   currentReciver: "",
   currentMessage: [],
   conversationId: "",
+  recentChat: [],
+  recomendedUser: [],
   setCurrentReciver: (reciver) => set(() => ({ currentReciver: reciver })),
   setConversationId: (convId) => set(() => ({ conversationId: convId })),
   setCurrentMessage: (messages) => set(() => ({ currentMessage: messages })),
-  resetCurrentMessage: () => set(() => ({ currentMessage: [] })),
   updateCurrentMessage: ({ senderId, message, timeStamp }) =>
     set((state) => ({
       currentMessage: [
@@ -15,6 +16,21 @@ const chatStore = create((set) => ({
         { senderId, message, timeStamp },
       ],
     })),
+  setRecentChat: (recentChat) => set(() => ({ recentChat: recentChat })),
+  updateRecentChat: (msg) => {
+    set((state) => {
+      const senderId = msg.sender.id;
+      const lastMessage = msg.message;
+
+      const msgSender = { ...msg.sender, lastMessage: lastMessage };
+
+      const filteredUserInfo = state.recentChat.filter(
+        (user) => user.id !== senderId
+      );
+
+      return { recentChat: [msgSender, ...filteredUserInfo] };
+    });
+  },
 }));
 
 export default chatStore;

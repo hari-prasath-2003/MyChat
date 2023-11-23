@@ -7,10 +7,10 @@ import { useNavigate } from "react-router-dom";
 import chatStore from "../../app/chatStore";
 import ProfileModal from "../../component/shared/ProfileModal";
 import { useDisclosure } from "@mantine/hooks";
+import socket from "../../services/socket";
 
 export default function SideNav() {
   const [recomendation, setRecomendation] = useState([]);
-  const [recent, setRecent] = useState([]);
   const [selectedProfile, setSelectedProfile] = useState({
     profile: "",
     name: "",
@@ -19,7 +19,9 @@ export default function SideNav() {
   const [opened, { open, close }] = useDisclosure(false);
 
   const serCurrentReciver = chatStore((state) => state.setCurrentReciver);
-  const setConversationId = chatStore((state) => state.setConversationId);
+  const recentChat = chatStore((state) => state.recentChat);
+  const setRecentChat = chatStore((state) => state.setRecentChat);
+  const updateRecentChat = chatStore((state) => state.updateRecentChat);
 
   const navigate = useNavigate();
 
@@ -30,7 +32,7 @@ export default function SideNav() {
   } = useApiGet("http://localhost:3000/chat/recomendation");
 
   const {
-    data: recentChat,
+    data: recentChatData,
     error: recentChatRequestError,
     loading: recentChatRequestLoading,
   } = useApiGet("http://localhost:3000/chat/recent");
@@ -42,10 +44,21 @@ export default function SideNav() {
   }, [recomendedUser]);
 
   useEffect(() => {
-    if (!recentChat) return;
+    if (!recentChatData) return;
 
-    setRecent(recentChat);
-  }, [recentChat]);
+    setRecentChat(recentChatData);
+  }, [recentChatData]);
+
+  useEffect(() => {
+    function handleIncommingMessage(msg) {
+      console.log(msg);
+      updateRecentChat(msg);
+    }
+
+    socket.on("incomming-message", handleIncommingMessage);
+
+    return () => socket.off("incomming-message", handleIncommingMessage);
+  }, []);
 
   function handleUserCardClick(id, name, profile) {
     const selectedReciver = { id: id, name: name, profile: profile };
@@ -70,7 +83,7 @@ export default function SideNav() {
           <Tabs.Panel value="chat">
             <ScrollArea scrollbarSize={0}>
               <Flex gap={20} direction={"column"} justify={"center"}>
-                {recent.map(({ name, profile, id, lastMessage }) => (
+                {recentChat.map(({ name, profile, id, lastMessage }) => (
                   <UserInfoCard
                     key={id}
                     lastMessage={lastMessage}
@@ -82,7 +95,7 @@ export default function SideNav() {
                     handleProfileClick={() => handleProfileClick(profile, name)}
                   ></UserInfoCard>
                 ))}
-                {recent.length === 0 && (
+                {recentChat.length === 0 && (
                   <Alert title="No chat history" color="yellow">
                     {"you don't have chat history find user in discover"}
                   </Alert>
@@ -93,21 +106,17 @@ export default function SideNav() {
           <Tabs.Panel value="discover">
             <ScrollArea scrollbarSize={0}>
               <Flex gap={20} direction={"column"}>
-                {recomendation.map(
-                  ({ name, profile, id, lastMessage }, index) => (
-                    <UserInfoCard
-                      key={index}
-                      name={name}
-                      profileImage={profile}
-                      handleUserCardClick={() =>
-                        handleUserCardClick(id, name, profile)
-                      }
-                      handleProfileClick={() =>
-                        handleProfileClick(profile, name)
-                      }
-                    ></UserInfoCard>
-                  )
-                )}
+                {recomendation.map(({ name, profile, id }, index) => (
+                  <UserInfoCard
+                    key={index}
+                    name={name}
+                    profileImage={profile}
+                    handleUserCardClick={() =>
+                      handleUserCardClick(id, name, profile)
+                    }
+                    handleProfileClick={() => handleProfileClick(profile, name)}
+                  ></UserInfoCard>
+                ))}
               </Flex>
             </ScrollArea>
           </Tabs.Panel>
