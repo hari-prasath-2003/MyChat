@@ -36,7 +36,7 @@ export default function Header({ currentReciverId, name, profile }) {
   }
 
   return (
-    <Flex justify={"space-between"}>
+    <Flex justify={"space-between"} h={50}>
       <Flex align={"center"} gap={5}>
         <Avatar
           src={import.meta.env.VITE_API_URL + "/assets/profile/" + profile}

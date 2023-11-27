@@ -1,4 +1,4 @@
-import { Button, Paper } from "@mantine/core";
+import { Button, Divider, Paper } from "@mantine/core";
 
 import chatStore from "../app/chatStore";
 
@@ -22,6 +22,8 @@ const Room = () => {
   const setCurrentMessage = chatStore((state) => state.setCurrentMessage);
   const updateCurrentMessage = chatStore((state) => state.updateCurrentMessage);
 
+  const chat = useRef(null);
+
   const navigate = useNavigate();
 
   const {
@@ -33,37 +35,25 @@ const Room = () => {
   );
 
   useEffect(() => {
+    chat.current = new Chat(userId, currentReciver.id);
+    chat.current.onMsg(updateCurrentMessage);
+
+    return () => chat.current.destroy();
+  }, [userId, currentReciver]);
+
+  useEffect(() => {
     if (!previousChatMsg) return;
 
     setCurrentMessage(previousChatMsg);
   }, [previousChatMsg]);
 
   useEffect(() => {
-    function handleMsgReceived(msg) {
-      const senderId = msg.senderId;
-
-      if (senderId !== currentReciver.id) return;
-
-      const message = msg.message;
-      updateCurrentMessage({ senderId, message });
-    }
-    socket.on("msg-received", handleMsgReceived);
-    return () => {
-      socket.off("msg-received", handleMsgReceived);
-    };
-  }, [currentReciver]);
-
-  useEffect(() => {
     if (!currentReciver) navigate("/home");
   }, [currentReciver]);
 
   function handleSendMsg(msg) {
-    const receiverId = currentReciver.id;
-    const senderId = userId;
-    const message = msg;
-    const timeStamp = new Date();
-    updateCurrentMessage({ senderId, message, timeStamp });
-    socket.emit("send-msg", { senderId, message, receiverId, timeStamp });
+    chat.current.sendMsg(msg);
+    updateCurrentMessage({ senderId: userId, message: msg });
   }
 
   return (
@@ -73,7 +63,9 @@ const Room = () => {
         name={currentReciver.name}
         profile={currentReciver.profile}
       />
+      <Divider />
       <ChatWindow currentMessage={currentMessage} />
+      <Divider />
       <ChatBox
         handleSendMsg={handleSendMsg}
         receiverId={currentReciver.id}

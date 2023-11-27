@@ -6,6 +6,7 @@ import socket from "../../services/socket";
 
 import { FaPaperclip } from "react-icons/fa6";
 import { CiVideoOn, CiImageOn, CiPaperplane } from "react-icons/ci";
+import MediaMenu from "./MediaMenu";
 
 export default function ChatBox({ handleSendMsg, receiverId, userId }) {
   const [msg, setMsg] = useState("");
@@ -26,7 +27,8 @@ export default function ChatBox({ handleSendMsg, receiverId, userId }) {
   }
 
   return (
-    <Group pos={"absolute"} bottom={0} w={"100%"} h={50}>
+    <Group pos={"absolute"} bottom={0} w={"100%"} h={50} gap={"sm"}>
+      <MediaMenu />
       <Input
         style={{ flex: 1 }}
         placeholder="Type a message ...."
@@ -37,21 +39,7 @@ export default function ChatBox({ handleSendMsg, receiverId, userId }) {
         }}
         onKeyDown={handleInputOnEnter}
       ></Input>
-
       <CiPaperplane onClick={msgSendHandler} size={25} />
-
-      <Menu>
-        <Menu.Target>
-          <ActionIcon variant="default" h={36}>
-            <FaPaperclip />
-          </ActionIcon>
-        </Menu.Target>
-        <Menu.Dropdown>
-          <Menu.Label>Media share</Menu.Label>
-          <Menu.Item leftSection={<CiVideoOn />}>Video</Menu.Item>
-          <Menu.Item leftSection={<CiImageOn />}>Image</Menu.Item>
-        </Menu.Dropdown>
-      </Menu>
     </Group>
   );
 }

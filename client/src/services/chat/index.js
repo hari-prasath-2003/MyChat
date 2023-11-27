@@ -4,9 +4,9 @@ export default class Chat {
   constructor(userId, receiverId) {
     this.userId = userId;
     this.receiverId = receiverId;
-    socket.on("msg-received", this.receiveMsg);
+    socket.on("msg-received", this.receiveMsg.bind(this));
   }
-  cleanup() {
+  destroy() {
     socket.off("msg-received", this.receiveMsg);
   }
 
@@ -18,7 +18,9 @@ export default class Chat {
   }
 
   receiveMsg(msg) {
+    console.log("msg-recv", msg);
     const senderId = msg.senderId;
+    console.log(senderId, this.receiverId);
 
     if (senderId !== this.receiverId) return;
 
