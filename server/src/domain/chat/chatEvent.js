@@ -8,12 +8,15 @@ export default function registerChatEventHandler(socket, io) {
     handleUserTyping(io, payload);
   });
 
-  socket.on("request-videocall", ({ receiverId, senderId }) => {
+  socket.on("request-call", ({ receiverId, senderId }) => {
     io.to(receiverId).emit("incomming-call", senderId);
   });
 
-  socket.on("accept-videocall", (receiverId) => {
-    console.log("call accepted to ", receiverId);
-    io.to(receiverId).emit("videocall-accepted");
+  socket.on("accept-call", (receiverId) => {
+    io.to(receiverId).emit("call-accepted");
+  });
+
+  socket.on("reject-call", (receiverId) => {
+    io.to(receiverId).emit("call-rejected");
   });
 }

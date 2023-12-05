@@ -1,7 +1,7 @@
 import { Alert, AppShell, Flex, Input, ScrollArea, Tabs } from "@mantine/core";
 
 import UserInfoCard from "../../UserInfoCard";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useApiGet } from "../../hooks/useApiGet";
 import { useNavigate } from "react-router-dom";
 import chatStore from "../../app/chatStore";
@@ -16,6 +16,12 @@ export default function SideNav() {
     name: "",
   });
 
+  const [chatFilter, setChatFilter] = useState("");
+  const [discoverFilter, setDiscoverFilter] = useState("");
+  const [activeTab, setActiveTab] = useState("chat");
+
+  const searchInput = useRef(null);
+
   const [opened, { open, close }] = useDisclosure(false);
 
   const serCurrentReciver = chatStore((state) => state.setCurrentReciver);
@@ -29,13 +35,13 @@ export default function SideNav() {
     data: recomendedUser,
     error: recomendationError,
     loading: recomendationLoading,
-  } = useApiGet("http://localhost:3000/chat/recomendation");
+  } = useApiGet("/chat/recomendation?filter=" + discoverFilter);
 
   const {
     data: recentChatData,
     error: recentChatRequestError,
     loading: recentChatRequestLoading,
-  } = useApiGet("http://localhost:3000/chat/recent");
+  } = useApiGet("/chat/recent?filter=" + chatFilter);
 
   useEffect(() => {
     if (!recomendedUser) return;
@@ -60,6 +66,14 @@ export default function SideNav() {
     return () => socket.off("incomming-message", handleIncommingMessage);
   }, []);
 
+  function handleSearch(e) {
+    if (e.code !== "Enter") return;
+
+    setChatFilter(searchInput.current.value);
+
+    setDiscoverFilter(searchInput.current.value);
+  }
+
   function handleUserCardClick(id, name, profile) {
     const selectedReciver = { id: id, name: name, profile: profile };
     serCurrentReciver(selectedReciver);
@@ -74,8 +88,12 @@ export default function SideNav() {
   return (
     <AppShell.Navbar p={"md"}>
       <Flex direction={"column"}>
-        <Input placeholder="search user"></Input>
-        <Tabs defaultValue={"chat"}>
+        <Input
+          placeholder="search user"
+          ref={searchInput}
+          onKeyDown={handleSearch}
+        ></Input>
+        <Tabs defaultValue={"chat"} onChange={setActiveTab}>
           <Tabs.List>
             <Tabs.Tab value="chat">Chat</Tabs.Tab>
             <Tabs.Tab value="discover">Discover</Tabs.Tab>

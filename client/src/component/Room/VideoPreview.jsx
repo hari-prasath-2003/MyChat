@@ -1,7 +1,7 @@
-import { AspectRatio, Box, Image, Modal } from "@mantine/core";
+import { AspectRatio, Box, Modal } from "@mantine/core";
 import { CiPaperplane } from "react-icons/ci";
 
-export default function ImagePreview({ opened, close, fileSrc }) {
+export default function VideoPreview({ opened, close, fileSrc }) {
   return (
     <Modal
       opened={opened}
@@ -13,7 +13,15 @@ export default function ImagePreview({ opened, close, fileSrc }) {
     >
       <Box pos={"relative"}>
         <AspectRatio ratio={"1/1"}>
-          <Image h={"calc(100% - 30px)"} src={fileSrc} />
+          <Box h={"calc(100% - 30px)"}>
+            <video
+              height={"100%"}
+              width={"100%"}
+              src={fileSrc}
+              controls
+              autoPlay
+            />
+          </Box>
         </AspectRatio>
         <CiPaperplane
           style={{ right: 0, bottom: 0, position: "absolute" }}

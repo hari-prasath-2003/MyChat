@@ -1,76 +1,58 @@
-import { useEffect, useRef } from "react";
-import { Peer } from "peerjs";
-import socket from "../services/socket";
 import { useLocation } from "react-router-dom";
-
 import userStore from "../app/userStore";
-import { Box, Grid, SimpleGrid } from "@mantine/core";
-import call from "../services/call";
+
+import { ActionIcon, Box, Flex, SimpleGrid } from "@mantine/core";
+import { MdCallEnd } from "react-icons/md";
+
+import useCall from "../hooks/useCall";
 
 export default function VideoCall() {
-  const userCamera = useRef(null);
-  const userCameraStream = useRef(null);
-  const remoteUserCamera = useRef(null);
-  const activeCall = useRef(null);
-
   const userId = userStore((state) => state.userId);
+  const userName = userStore((state) => state.userName);
+  const userProfile = userStore((state) => state.userProfile);
+
+  const user = { id: userId, name: userName, profile: userProfile };
 
   const location = useLocation();
-
   const role = location.state?.role;
   const receiverId = location.state?.receiverId;
 
-  useEffect(() => {
-    (async () => {
-      await getUserMedia();
+  console.log(role);
 
-      activeCall.current = new call.VideoCall(
-        userId,
-        receiverId,
-        userCameraStream.current,
-        userCamera.current,
-        remoteUserCamera.current
-      );
-
-      if (role === "caller") {
-        activeCall.current.requestVideoCall();
-      }
-      if (role === "callee") {
-        activeCall.current.acceptVideoCall();
-      }
-
-      socket.on(
-        "videocall-accepted",
-        activeCall.current.handleCallAccepted.bind(activeCall.current)
-      );
-    })();
-
-    return () => {
-      socket.off(
-        "videocall-accepted",
-        activeCall.current.handleCallAccepted.bind(activeCall.current)
-      );
-    };
-  }, []);
-
-  async function getUserMedia() {
-    userCameraStream.current = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true,
-    });
-    userCamera.current.srcObject = userCameraStream.current;
-  }
+  const { userMedia, remoteUserMedia, endCall } = useCall(
+    user,
+    receiverId,
+    role
+  );
 
   return (
-    <div>
+    <Box h={"100%"}>
       <SimpleGrid cols={{ base: 1, md: 2 }}>
         <Box>
-          <video ref={userCamera} autoPlay muted></video>
+          <video ref={userMedia} autoPlay muted></video>
         </Box>
         <Box>
-          <video ref={remoteUserCamera} autoPlay></video>
+          <video ref={remoteUserMedia} autoPlay></video>
         </Box>
       </SimpleGrid>
-    </div>
+      <Flex
+        align={"center"}
+        justify={"center"}
+        pos={"absolute"}
+        bottom={0}
+        w={"100%"}
+      >
+        <ActionIcon
+          p={5}
+          size={40}
+          variant="outline"
+          color="red"
+          radius={"50%"}
+          onClick={endCall}
+        >
+          <MdCallEnd size={40} color="red" />
+        </ActionIcon>
+      </Flex>
+    </Box>
   );
 }

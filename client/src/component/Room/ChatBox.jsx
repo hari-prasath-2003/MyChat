@@ -1,12 +1,10 @@
-import { Group, Input, Menu, ActionIcon } from "@mantine/core";
-import { BsSendFill } from "react-icons/bs";
+import { Group, Input } from "@mantine/core";
 
-import { useEffect, useState } from "react";
 import socket from "../../services/socket";
 
-import { FaPaperclip } from "react-icons/fa6";
-import { CiVideoOn, CiImageOn, CiPaperplane } from "react-icons/ci";
+import { CiPaperplane } from "react-icons/ci";
 import MediaMenu from "./MediaMenu";
+import { useState } from "react";
 
 export default function ChatBox({ handleSendMsg, receiverId, userId }) {
   const [msg, setMsg] = useState("");

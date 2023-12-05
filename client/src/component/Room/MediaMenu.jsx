@@ -1,28 +1,67 @@
-import { ActionIcon, Container, Menu, Modal } from "@mantine/core";
+import {
+  ActionIcon,
+  AspectRatio,
+  Box,
+  Container,
+  Image,
+  Menu,
+  Modal,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { useRef, useState } from "react";
-import { CiImageOn, CiVideoOn } from "react-icons/ci";
+import { useEffect, useRef, useState } from "react";
+import { CiImageOn, CiPaperplane, CiVideoOn } from "react-icons/ci";
 import { FaPaperclip } from "react-icons/fa6";
+import VideoPreview from "./VideoPreview";
+import ImagePreview from "./ImagePreview";
 
 export default function MediaMenu() {
-  const imgFilePreview = useRef(null);
-  const videoFilePreview = useRef(null);
+  const [videoFileSrc, setVideoFileSrc] = useState(null);
+  const [imgFileSrc, setImgFileSrc] = useState(null);
 
-  const [opened, { open, close }] = useDisclosure(false);
+  const videoFileInput = useRef(null);
+  const imgFileInput = useRef(null);
+
+  const [vidModalOpened, { open: openVidModal, close: closeVidModal }] =
+    useDisclosure(false);
+  const [imgModalOpened, { open: openImgModal, close: closeImgModal }] =
+    useDisclosure(false);
+
+  useEffect(() => {
+    if (!vidModalOpened) {
+      URL.revokeObjectURL(videoFileSrc);
+      setVideoFileSrc(null);
+    }
+  }, [vidModalOpened, videoFileSrc]);
+
+  useEffect(() => {
+    if (!imgModalOpened) {
+      URL.revokeObjectURL(imgFileSrc);
+      setImgFileSrc(null);
+    }
+  }, [imgModalOpened, imgFileSrc]);
 
   function openVideoFP() {
-    videoFilePreview.current.click();
+    videoFileInput.current.click();
   }
 
   function openImageFP() {
-    imgFilePreview.current.click();
+    console.log("file preview called");
+    imgFileInput.current.click();
   }
 
-  function handleVideoSelect() {
-    open();
+  function handleVideoSelect(event) {
+    const selectedFile = event.target.files[0];
+    const src = URL.createObjectURL(selectedFile);
+    setVideoFileSrc(src);
+    openVidModal();
   }
 
-  function handleImageSelect() {}
+  function handleImageSelect(event) {
+    const selectedFile = event.target.files[0];
+    const src = URL.createObjectURL(selectedFile);
+    setImgFileSrc(src);
+    openImgModal();
+  }
 
   return (
     <>
@@ -37,7 +76,7 @@ export default function MediaMenu() {
           <Menu.Item leftSection={<CiVideoOn />} onClick={openVideoFP}>
             Video
           </Menu.Item>
-          <Menu.Item leftSection={<CiImageOn />} onclick={openImageFP}>
+          <Menu.Item leftSection={<CiImageOn />} onClick={openImageFP}>
             Image
           </Menu.Item>
         </Menu.Dropdown>
@@ -45,24 +84,27 @@ export default function MediaMenu() {
           style={{ display: "none" }}
           type="file"
           accept="video/*"
-          ref={videoFilePreview}
+          ref={videoFileInput}
           onChange={handleVideoSelect}
         />
         <input
           style={{ display: "none" }}
           type="file"
           accept="image/*"
-          ref={imgFilePreview}
+          ref={imgFileInput}
+          onChange={handleImageSelect}
         />
       </Menu>
-      <Modal
-        opened={opened}
-        onClose={close}
-        title="Media preview page"
-        radius={0}
-        centered
-        transitionProps={{ transition: "fade", duration: 200 }}
-      ></Modal>
+      <VideoPreview
+        opened={vidModalOpened}
+        close={closeVidModal}
+        fileSrc={videoFileSrc}
+      />
+      <ImagePreview
+        opened={imgModalOpened}
+        close={closeImgModal}
+        fileSrc={imgFileSrc}
+      />
     </>
   );
 }

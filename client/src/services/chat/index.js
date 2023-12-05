@@ -18,9 +18,7 @@ export default class Chat {
   }
 
   receiveMsg(msg) {
-    console.log("msg-recv", msg);
     const senderId = msg.senderId;
-    console.log(senderId, this.receiverId);
 
     if (senderId !== this.receiverId) return;
 

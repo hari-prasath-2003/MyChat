@@ -1,7 +1,7 @@
 export default async function get(url) {
   try {
     // make api call to server
-    const res = await fetch(url, {
+    const res = await fetch(import.meta.env.VITE_API_URL + url, {
       credentials: "include",
     });
 

@@ -33,7 +33,7 @@ const Login = () => {
     loading,
     error: apiError,
     postData,
-  } = useApiPost("http://localhost:3000/auth/login");
+  } = useApiPost("/auth/login");
 
   useEffect(() => {
     if (!data) {
@@ -42,6 +42,7 @@ const Login = () => {
 
     if (data.success) {
       navigate("/home");
+      console.log("came here after login");
     } else {
       setError(data.message);
     }

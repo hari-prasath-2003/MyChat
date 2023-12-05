@@ -10,7 +10,7 @@ export async function recentChatHandler(req, res) {
       users: { $in: [userId] },
     });
 
-    const otherUsersInfoAndLastMsg = await Promise.all(
+    const userChat = await Promise.all(
       userContact.map(async ({ users, conversationId }) => {
         const otherUserId = users.find((user) => user !== userId);
         const userInfo = await getUserInfo(otherUserId);
@@ -31,7 +31,12 @@ export async function recentChatHandler(req, res) {
       })
     );
 
-    res.json(otherUsersInfoAndLastMsg);
+    const nameFilter = req.query.filter;
+    const filteredUserChat = userChat.filter(({ name }) =>
+      name.includes(nameFilter)
+    );
+
+    res.json(filteredUserChat);
   } catch (error) {
     console.log(error.message);
     res.status(500).json("server error");
@@ -39,8 +44,9 @@ export async function recentChatHandler(req, res) {
 }
 
 export async function recomendationHandler(req, res) {
+  const nameFilter = req.query.filter;
   const userRec = await User.find(
-    { id: { $ne: req.userId } },
+    { id: { $ne: req.userId }, name: { $regex: nameFilter, $options: "i" } },
     { name: 1, profile: 1, id: 1, _id: 0 }
   ).limit(20);
 

@@ -33,7 +33,7 @@ const Signup = () => {
     loading,
     error: apiError,
     postData,
-  } = useApiPost("http://localhost:3000/auth/signup");
+  } = useApiPost("/auth/signup");
 
   useEffect(() => {
     if (!data) {

@@ -11,22 +11,18 @@ import Main from "./Layout/mainLayout/Main";
 import { useEffect } from "react";
 import ProtectedRoute from "./ProtectedRoute";
 import { useNavigate } from "react-router-dom";
+import useCallListner from "./hooks/useCallListner";
+import NotificationCall from "./component/shared/NotificationCall";
 
 export default function App() {
   const [opened, { toggle }] = useDisclosure();
+  const { incomingCaller, acceptCall, rejectCall } = useCallListner();
   const navigate = useNavigate();
 
   useEffect(() => {
-    async function handleIncommingCall(senderId) {
-      navigate("/video-call", {
-        state: {
-          role: "callee",
-          receiverId: senderId,
-        },
-      });
-    }
-    socket.on("incomming-call", handleIncommingCall);
-    return () => socket.off("incomming-call", handleIncommingCall);
+    socket.io.opts.extraHeaders["Authorization"] = document.cookie;
+    socket.connect();
+    return () => socket.disconnect();
   }, []);
 
   return (
@@ -43,6 +39,9 @@ export default function App() {
         <TopNav SideNavOpened={opened} toggle={toggle} />
         <SideNav />
         <Main />
+        {incomingCaller && (
+          <NotificationCall caller={incomingCaller} rejectCall={rejectCall} />
+        )}
       </AppShell>
     </ProtectedRoute>
   );

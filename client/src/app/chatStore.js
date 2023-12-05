@@ -3,11 +3,9 @@ import { create } from "zustand";
 const chatStore = create((set) => ({
   currentReciver: "",
   currentMessage: [],
-  conversationId: "",
   recentChat: [],
   recomendedUser: [],
   setCurrentReciver: (reciver) => set(() => ({ currentReciver: reciver })),
-  setConversationId: (convId) => set(() => ({ conversationId: convId })),
   setCurrentMessage: (messages) => set(() => ({ currentMessage: messages })),
   updateCurrentMessage: ({ senderId, message, timeStamp }) =>
     set((state) => ({
