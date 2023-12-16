@@ -12,7 +12,7 @@ import {
 } from "@mantine/core";
 import { LuPhoneCall, LuPhoneIncoming, LuPhoneOff } from "react-icons/lu";
 
-export default function NotificationCall({ caller, acceptCall, rejectCall }) {
+export default function CallNotification({ caller, acceptCall, rejectCall }) {
   return (
     <Dialog opened size="lg" radius="md">
       <Text size="sm" mb="xs" fw={500}>
@@ -27,7 +27,11 @@ export default function NotificationCall({ caller, acceptCall, rejectCall }) {
         <Text fw={"bold"}>{caller.name}</Text>
       </Flex>
       <Group align="flex-end">
-        <Button onClick={close} color="green" rightSection={<LuPhoneCall />}>
+        <Button
+          onClick={acceptCall}
+          color="green"
+          rightSection={<LuPhoneCall />}
+        >
           Accept
         </Button>
         <Button onClick={rejectCall} color="red" rightSection={<LuPhoneOff />}>

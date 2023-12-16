@@ -11,9 +11,11 @@ export default class CallManager {
   ) {
     this.user = user;
     this.receiverId = receiverId;
+    this.callAccepted = false;
     this.userMediaStream = userMediaStream;
     this.remoteUserMedia = remoteUserMediaRef;
     this.callEndCallback = callEndCallback;
+    this.peer = new Peer(this.user.id, { host: "/", port: "3001" });
     this.callRingAudio = new Audio("/audio/callRinging.m4a");
     this.callRingAudio.loop = true;
     this.callRingAudio.preload = true;
@@ -26,22 +28,24 @@ export default class CallManager {
   }
 
   destroy() {
-    socket.off("call-accepted", this.handleCallAccepted.bind(this));
-    socket.off("call-rejected", this.handleCallEnd.bind(this));
-    socket.on("end-call", this.handleCallEnd.bind(this));
+    socket.off("call-accepted");
+    socket.off("call-rejected");
+    socket.off("end-call");
+    this.peer.disconnect();
+    this.peer.destroy();
   }
 
   requestVideoCall() {
     this.callRingAudio.play();
-    this.callRingAudio.loop = true;
+
     socket.emit("request-call", {
       receiverId: this.receiverId,
-      senderId: this.user,
+      sender: this.user,
     });
   }
 
   acceptVideoCall() {
-    this.peer = new Peer(this.user, { host: "/", port: "3001" });
+    this.callAccepted = true;
 
     this.peer.on("call", (call) => {
       call.answer(this.userMediaStream);
@@ -54,13 +58,19 @@ export default class CallManager {
   }
 
   handleCallAccepted() {
-    this.callRingAudio.pause();
+    try {
+      this.callAccepted = true;
 
-    this.peer = new Peer(this.user, { host: "/", port: "3001" });
-    const call = this.peer.call(this.receiverId, this.userMediaStream);
-    call.on("stream", (remoteStream) => {
-      this.remoteUserMedia.srcObject = remoteStream;
-    });
+      this.callRingAudio.pause();
+
+      const call = this.peer.call(this.receiverId, this.userMediaStream);
+
+      call.on("stream", (remoteStream) => {
+        this.remoteUserMedia.srcObject = remoteStream;
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
   }
 
   handleCallEnd() {
@@ -70,7 +80,11 @@ export default class CallManager {
   }
 
   endCall() {
-    socket.emit("endCall");
+    if (this.callAccepted) {
+      socket.emit("end-call", this.receiverId);
+    } else {
+      socket.emit("abort-callRequest", this.receiverId);
+    }
     this.handleCallEnd();
   }
 }

@@ -1,5 +1,4 @@
 import { Text, Paper, Box, Flex, Avatar } from "@mantine/core";
-import ProfileImage from "./component/shared/ProfileImage";
 
 export default function UserInfoCard({
   name,

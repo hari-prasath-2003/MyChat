@@ -1,6 +1,6 @@
 import { Alert, AppShell, Flex, Input, ScrollArea, Tabs } from "@mantine/core";
 
-import UserInfoCard from "../../UserInfoCard";
+import UserInfoCard from "../../component/shared/UserInfoCard";
 import { useEffect, useRef, useState } from "react";
 import { useApiGet } from "../../hooks/useApiGet";
 import { useNavigate } from "react-router-dom";
@@ -22,7 +22,7 @@ export default function SideNav() {
 
   const searchInput = useRef(null);
 
-  const [opened, { open, close }] = useDisclosure(false);
+  const [profileOpened, { openProfile, closeProfile }] = useDisclosure(false);
 
   const serCurrentReciver = chatStore((state) => state.setCurrentReciver);
   const recentChat = chatStore((state) => state.recentChat);
@@ -32,32 +32,38 @@ export default function SideNav() {
   const navigate = useNavigate();
 
   const {
+    data: recentChatData,
+    error: recentChatRequestError,
+    loading: recentChatRequestLoading,
+  } = useApiGet("/chat/recent");
+
+  const {
     data: recomendedUser,
     error: recomendationError,
     loading: recomendationLoading,
   } = useApiGet("/chat/recomendation?filter=" + discoverFilter);
 
-  const {
-    data: recentChatData,
-    error: recentChatRequestError,
-    loading: recentChatRequestLoading,
-  } = useApiGet("/chat/recent?filter=" + chatFilter);
+  const filteredChat =
+    recentChatData?.filter(({ name }) =>
+      name.toLowerCase().includes(chatFilter.toLowerCase())
+    ) || [];
 
-  useEffect(() => {
-    if (!recomendedUser) return;
+  console.log("rerender");
 
-    setRecomendation(recomendedUser);
-  }, [recomendedUser]);
+  // useEffect(() => {
+  //   if (!recentChatData) return;
 
-  useEffect(() => {
-    if (!recentChatData) return;
+  //   setRecentChat(recentChatData);
+  // }, [recentChatData]);
 
-    setRecentChat(recentChatData);
-  }, [recentChatData]);
+  // useEffect(() => {
+  //   if (!recomendedUser) return;
+
+  //   setRecomendation(recomendedUser);
+  // }, [recomendedUser]);
 
   useEffect(() => {
     function handleIncommingMessage(msg) {
-      console.log(msg);
       updateRecentChat(msg);
     }
 
@@ -67,22 +73,19 @@ export default function SideNav() {
   }, []);
 
   function handleSearch(e) {
-    if (e.code !== "Enter") return;
-
     setChatFilter(searchInput.current.value);
 
     setDiscoverFilter(searchInput.current.value);
   }
 
   function handleUserCardClick(id, name, profile) {
-    const selectedReciver = { id: id, name: name, profile: profile };
-    serCurrentReciver(selectedReciver);
+    serCurrentReciver({ id, name, profile });
     navigate("/room");
   }
 
   function handleProfileClick(profile, name) {
     setSelectedProfile({ profile, name });
-    open();
+    openProfile();
   }
 
   return (
@@ -91,7 +94,7 @@ export default function SideNav() {
         <Input
           placeholder="search user"
           ref={searchInput}
-          onKeyDown={handleSearch}
+          onChange={handleSearch}
         ></Input>
         <Tabs defaultValue={"chat"} onChange={setActiveTab}>
           <Tabs.List>
@@ -101,7 +104,7 @@ export default function SideNav() {
           <Tabs.Panel value="chat">
             <ScrollArea scrollbarSize={0}>
               <Flex gap={20} direction={"column"} justify={"center"}>
-                {recentChat.map(({ name, profile, id, lastMessage }) => (
+                {filteredChat.map(({ name, profile, id, lastMessage }) => (
                   <UserInfoCard
                     key={id}
                     lastMessage={lastMessage}
@@ -113,7 +116,7 @@ export default function SideNav() {
                     handleProfileClick={() => handleProfileClick(profile, name)}
                   ></UserInfoCard>
                 ))}
-                {recentChat.length === 0 && (
+                {filteredChat.length === 0 && (
                   <Alert title="No chat history" color="yellow">
                     {"you don't have chat history find user in discover"}
                   </Alert>
@@ -140,7 +143,11 @@ export default function SideNav() {
           </Tabs.Panel>
         </Tabs>
       </Flex>
-      <ProfileModal user={selectedProfile} opened={opened} close={close} />
+      <ProfileModal
+        user={selectedProfile}
+        opened={profileOpened}
+        close={closeProfile}
+      />
     </AppShell.Navbar>
   );
 }

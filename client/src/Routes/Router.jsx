@@ -1,12 +1,12 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Login from "./pages/Login";
-import App from "./App";
-import Room from "./pages/Room";
-import Signup from "./pages/Signup";
-import Home from "./pages/Home";
-import VideoCall from "./pages/VideoCall";
+import Login from "../pages/Login";
+import App from "../App";
+import Room from "../pages/Room";
+import Signup from "../pages/Signup";
+import Home from "../pages/Home";
+import VideoCall from "../pages/VideoCall";
 
-export default function AppRoutes() {
+export default function Router() {
   return (
     <BrowserRouter>
       <Routes>

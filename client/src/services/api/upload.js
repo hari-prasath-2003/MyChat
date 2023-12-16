@@ -13,6 +13,7 @@ export default async function upload(url, body, fileType, assetType) {
 
     return await res.json();
   } catch (error) {
+    console.log(error);
     throw new Error("An error occurred while processing the request.");
   }
 }

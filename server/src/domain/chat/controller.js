@@ -31,12 +31,7 @@ export async function recentChatHandler(req, res) {
       })
     );
 
-    const nameFilter = req.query.filter;
-    const filteredUserChat = userChat.filter(({ name }) =>
-      name.includes(nameFilter)
-    );
-
-    res.json(filteredUserChat);
+    res.json(userChat);
   } catch (error) {
     console.log(error.message);
     res.status(500).json("server error");

@@ -17,8 +17,6 @@ export default function VideoCall() {
   const role = location.state?.role;
   const receiverId = location.state?.receiverId;
 
-  console.log(role);
-
   const { userMedia, remoteUserMedia, endCall } = useCall(
     user,
     receiverId,

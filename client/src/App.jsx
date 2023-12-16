@@ -9,15 +9,14 @@ import SideNav from "./Layout/mainLayout/SideNav";
 import Main from "./Layout/mainLayout/Main";
 
 import { useEffect } from "react";
-import ProtectedRoute from "./ProtectedRoute";
-import { useNavigate } from "react-router-dom";
+import ProtectedRoute from "./Routes/ProtectedRoute";
 import useCallListner from "./hooks/useCallListner";
-import NotificationCall from "./component/shared/NotificationCall";
+import CallNotification from "./component/shared/CallNotification";
 
 export default function App() {
   const [opened, { toggle }] = useDisclosure();
-  const { incomingCaller, acceptCall, rejectCall } = useCallListner();
-  const navigate = useNavigate();
+  const { incomingCaller, showNotification, acceptCall, rejectCall } =
+    useCallListner();
 
   useEffect(() => {
     socket.io.opts.extraHeaders["Authorization"] = document.cookie;
@@ -39,8 +38,12 @@ export default function App() {
         <TopNav SideNavOpened={opened} toggle={toggle} />
         <SideNav />
         <Main />
-        {incomingCaller && (
-          <NotificationCall caller={incomingCaller} rejectCall={rejectCall} />
+        {showNotification && (
+          <CallNotification
+            caller={incomingCaller}
+            rejectCall={rejectCall}
+            acceptCall={acceptCall}
+          />
         )}
       </AppShell>
     </ProtectedRoute>

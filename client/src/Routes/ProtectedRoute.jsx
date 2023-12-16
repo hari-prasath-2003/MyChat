@@ -1,6 +1,6 @@
 import { Navigate } from "react-router-dom";
-import { useApiGet } from "./hooks/useApiGet";
-import userStore from "./app/userStore";
+import { useApiGet } from "../hooks/useApiGet";
+import userStore from "../app/userStore";
 
 export default function ProtectedRoute({ children }) {
   const { data: userData, error, loading } = useApiGet("/user");

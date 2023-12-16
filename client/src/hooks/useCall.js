@@ -11,7 +11,7 @@ export default function useCall(user, receiverId, role) {
   const navigate = useNavigate();
 
   function callEndCallback() {
-    setTimeout(() => navigate("/home"), 3000);
+    setTimeout(() => navigate("/home"), 1000);
   }
 
   useEffect(() => {
@@ -25,8 +25,6 @@ export default function useCall(user, receiverId, role) {
         remoteUserMedia.current,
         callEndCallback
       );
-
-      console.log(role);
 
       if (role === "caller") {
         console.log("came here as caller");
@@ -59,6 +57,7 @@ export default function useCall(user, receiverId, role) {
   function endCall() {
     activeCall.current.endCall();
   }
+
   return {
     userMedia,
     remoteUserMedia,

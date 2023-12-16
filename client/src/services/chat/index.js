@@ -7,7 +7,7 @@ export default class Chat {
     socket.on("msg-received", this.receiveMsg.bind(this));
   }
   destroy() {
-    socket.off("msg-received", this.receiveMsg);
+    socket.off("msg-received");
   }
 
   sendMsg(msg) {

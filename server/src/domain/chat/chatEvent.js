@@ -8,8 +8,8 @@ export default function registerChatEventHandler(socket, io) {
     handleUserTyping(io, payload);
   });
 
-  socket.on("request-call", ({ receiverId, senderId }) => {
-    io.to(receiverId).emit("incomming-call", senderId);
+  socket.on("request-call", ({ receiverId, sender }) => {
+    io.to(receiverId).emit("incomming-call", sender);
   });
 
   socket.on("accept-call", (receiverId) => {
@@ -18,5 +18,12 @@ export default function registerChatEventHandler(socket, io) {
 
   socket.on("reject-call", (receiverId) => {
     io.to(receiverId).emit("call-rejected");
+  });
+
+  socket.on("end-call", (receiverId) => {
+    io.to(receiverId).emit("end-call");
+  });
+  socket.on("abort-callRequest", (receiverId) => {
+    io.to(receiverId).emit("call-requestAborted");
   });
 }

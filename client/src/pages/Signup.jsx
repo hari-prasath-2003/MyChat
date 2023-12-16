@@ -67,7 +67,7 @@ const Signup = () => {
 
       reader.onload = async (e) => {
         const { fileName } = await api.upload(
-          "http://localhost:3000/user/profile",
+          "http://localhost:3000/auth/profile",
           e.target.result,
           fileType,
           assetType
