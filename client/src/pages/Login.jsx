@@ -22,8 +22,6 @@ const Login = () => {
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
 
-  const setUser = userStore((state) => state.setUser);
-
   const [error, setError] = useState("");
 
   const navigate = useNavigate();

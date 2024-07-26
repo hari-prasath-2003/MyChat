@@ -9,10 +9,12 @@ export default function registerChatEventHandler(socket, io) {
   });
 
   socket.on("request-call", ({ receiverId, sender }) => {
+    console.log("call request");
     io.to(receiverId).emit("incomming-call", sender);
   });
 
-  socket.on("accept-call", (receiverId) => {
+  socket.on("accept-call", ({ senderId, receiverId }) => {
+    socket.broadcast.to(senderId).emit("call-requestAborted");
     io.to(receiverId).emit("call-accepted");
   });
 

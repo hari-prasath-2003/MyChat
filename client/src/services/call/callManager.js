@@ -32,7 +32,8 @@ export default class CallManager {
     socket.off("call-rejected");
     socket.off("end-call");
     this.peer.disconnect();
-    this.peer.destroy();
+    this.callRingAudio.pause();
+    this.callRejectAudio.pause();
   }
 
   requestVideoCall() {
@@ -54,7 +55,10 @@ export default class CallManager {
       });
     });
 
-    socket.emit("accept-call", this.receiverId);
+    socket.emit("accept-call", {
+      senderId: this.user.id,
+      receiverId: this.receiverId,
+    });
   }
 
   handleCallAccepted() {

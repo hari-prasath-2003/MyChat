@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
   email: { type: String, require: true },
   password: { type: String, require: true },
   profile: { type: String, default: "" },
-  id: { type: String, default: uuidv4() },
+  id: { type: String, default: () => uuidv4() },
 });
 
 userSchema.pre("save", function () {

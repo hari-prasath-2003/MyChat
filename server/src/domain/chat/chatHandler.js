@@ -28,5 +28,5 @@ export async function handleSendMsg(io, payload) {
 }
 
 export function handleUserTyping(io, payload) {
-  io.to(payload.receiverId).emit("user-typing", { senderId: payload.senderId });
+  io.to(payload.receiverId).emit("user-typing", { id: payload.senderId });
 }

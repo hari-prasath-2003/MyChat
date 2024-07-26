@@ -8,7 +8,7 @@ import TopNav from "./Layout/mainLayout/TopNav";
 import SideNav from "./Layout/mainLayout/SideNav";
 import Main from "./Layout/mainLayout/Main";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import ProtectedRoute from "./Routes/ProtectedRoute";
 import useCallListner from "./hooks/useCallListner";
 import CallNotification from "./component/shared/CallNotification";
@@ -25,27 +25,29 @@ export default function App() {
   }, []);
 
   return (
-    <ProtectedRoute>
-      <AppShell
-        header={{ height: 60 }}
-        navbar={{
-          width: 300,
-          breakpoint: "sm",
-          collapsed: { mobile: !opened },
-        }}
-        padding="md"
-      >
-        <TopNav SideNavOpened={opened} toggle={toggle} />
-        <SideNav />
-        <Main />
-        {showNotification && (
-          <CallNotification
-            caller={incomingCaller}
-            rejectCall={rejectCall}
-            acceptCall={acceptCall}
-          />
-        )}
-      </AppShell>
-    </ProtectedRoute>
+    <Suspense fallback={<>Loading.....</>}>
+      <ProtectedRoute>
+        <AppShell
+          header={{ height: 60 }}
+          navbar={{
+            width: 300,
+            breakpoint: "sm",
+            collapsed: { mobile: !opened },
+          }}
+          padding="md"
+        >
+          <TopNav SideNavOpened={opened} toggle={toggle} />
+          <SideNav />
+          <Main />
+          {showNotification && (
+            <CallNotification
+              caller={incomingCaller}
+              rejectCall={rejectCall}
+              acceptCall={acceptCall}
+            />
+          )}
+        </AppShell>
+      </ProtectedRoute>
+    </Suspense>
   );
 }

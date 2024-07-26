@@ -12,8 +12,8 @@ export default class CallListner {
     socket.on("call-requestAborted", this.handelCallAbort.bind(this));
   }
   destroy() {
-    socket.off("incomming-call", this.handleIncomingCall.bind(this));
-    socket.off("call-requestAborted", this.handelCallAbort.bind(this));
+    socket.off("incomming-call");
+    socket.off("call-requestAborted");
   }
   handleIncomingCall(caller) {
     this.callRingTone.play();
@@ -22,6 +22,7 @@ export default class CallListner {
 
   acceptCall() {
     this.callRingTone.pause();
+    console.log(this.callRingTone.paused);
   }
 
   rejectCall(receiverId) {

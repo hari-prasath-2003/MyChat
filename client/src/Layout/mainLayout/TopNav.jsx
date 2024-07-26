@@ -1,9 +1,9 @@
 import { AppShell, Avatar, Burger, Flex, Text } from "@mantine/core";
 
-import ProfileModal from "../../component/shared/ProfileModal";
-
 import userStore from "../../app/userStore";
 import { useDisclosure } from "@mantine/hooks";
+
+import ProfileModal from "../../component/SideNav/ProfileModal";
 
 export default function TopNav({ SideNavOpened, toggle }) {
   const userProfile = userStore((state) => state.userProfile);

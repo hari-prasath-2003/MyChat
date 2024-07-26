@@ -18,6 +18,12 @@ export default function useCallListner() {
     }
 
     callListner.current = new CallListner(onCallCallback, onCallAbortCallback);
+
+    return () => {
+      if (callListner.current) {
+        callListner.current.destroy();
+      }
+    };
   }, []);
 
   function acceptCall() {

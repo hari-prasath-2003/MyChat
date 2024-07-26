@@ -2,32 +2,29 @@ import { useEffect, useRef } from "react";
 import CallManager from "../services/call/callManager";
 import { useNavigate } from "react-router-dom";
 
-export default function useCall(user, receiverId, role) {
-  const userMediaStream = useRef(null);
-  const userMedia = useRef(null);
+export default function useCall(user, receiverId, role, userMediaStream) {
   const remoteUserMedia = useRef(null);
   const activeCall = useRef(null);
 
   const navigate = useNavigate();
 
   function callEndCallback() {
-    setTimeout(() => navigate("/home"), 1000);
+    setTimeout(() => navigate("/home"), 3000);
   }
 
   useEffect(() => {
-    async function initCall() {
-      await getUserMedia();
+    if (!userMediaStream) return;
 
+    async function initCall() {
       activeCall.current = new CallManager(
         user,
         receiverId,
-        userMediaStream.current,
+        userMediaStream,
         remoteUserMedia.current,
         callEndCallback
       );
 
       if (role === "caller") {
-        console.log("came here as caller");
         activeCall.current.requestVideoCall();
       }
       if (role === "callee") {
@@ -38,28 +35,15 @@ export default function useCall(user, receiverId, role) {
     initCall();
 
     return () => {
-      activeCall.current.destroy();
-      const tracks = userMediaStream.current.getTracks();
-      tracks.forEach((track) => track.stop());
+      activeCall.current?.destroy();
     };
-  }, [role, receiverId, user]);
-
-  async function getUserMedia() {
-    userMediaStream.current = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true,
-    });
-    if (userMedia.current) {
-      userMedia.current.srcObject = userMediaStream.current;
-    }
-  }
+  }, [userMediaStream]);
 
   function endCall() {
     activeCall.current.endCall();
   }
 
   return {
-    userMedia,
     remoteUserMedia,
     endCall,
   };

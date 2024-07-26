@@ -44,7 +44,7 @@ export async function recomendationHandler(req, res) {
     { id: { $ne: req.userId }, name: { $regex: nameFilter, $options: "i" } },
     { name: 1, profile: 1, id: 1, _id: 0 }
   ).limit(20);
-
+  console.log({ userRec });
   res.json(userRec);
 }
 

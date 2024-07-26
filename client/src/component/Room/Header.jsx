@@ -14,8 +14,8 @@ export default function Header({ currentReciverId, name, profile }) {
   useEffect(() => {
     let typingStopTimer;
 
-    function handleUserTyping({ senderId }) {
-      if (senderId !== currentReciverId) return;
+    function handleUserTyping({ id }) {
+      if (id !== currentReciverId) return;
 
       clearTimeout(typingStopTimer);
       setIsTyping(true);
